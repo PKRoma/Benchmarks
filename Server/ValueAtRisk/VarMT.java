@@ -15,7 +15,7 @@ import static java.lang.Math.sqrt;
 public class VarMT {
 
   static final int NS = 10;
-  static final int CORES = 12;
+  static final int CORES = 8;
 
   static long initialSeed(int index) {
     long seed = 1;
