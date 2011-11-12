@@ -1,6 +1,6 @@
 import java.util.Arrays;
 
-import static com.sun.org.apache.xalan.internal.lib.ExsltMath.exp;
+import static java.lang.Math.exp;
 import static java.lang.Math.floor;
 import static java.lang.Math.log;
 import static java.lang.Math.sqrt;
