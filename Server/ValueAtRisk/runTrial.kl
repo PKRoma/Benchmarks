@@ -1,12 +1,10 @@
 function Size initialSeed(Size index) {
   Size result = 1;
   Size mult = 300773;
-  Size mask = 1;
-  while (mask != 0) {
+  for (Size mask=1; mask; mask<<=1) {
     if (index & mask)
       result = (result * mult) % 1073741824;
     mult = (mult * mult) % 1073741824;
-    mask *= 2;
   }
   return result;
 }
