@@ -5,7 +5,7 @@
 
 #define NS 10
 
-inline uint32_t initialSeed( size_t index )
+uint32_t initialSeed( size_t index )
 {
   uint32_t seed = 1;
   uint32_t mult = 300773;
@@ -87,7 +87,7 @@ inline double runTrial(
   return value;
 }
 
-inline void trans( double A[NS][NS], double B[NS][NS] )
+void trans( double A[NS][NS], double B[NS][NS] )
 {
   for ( size_t i=0; i<NS; ++i )
   {
@@ -98,7 +98,7 @@ inline void trans( double A[NS][NS], double B[NS][NS] )
   }
 }
 
-inline void multMatMat( double A[NS][NS], double B[NS][NS], double R[NS][NS] )
+void multMatMat( double A[NS][NS], double B[NS][NS], double R[NS][NS] )
 {
   for ( size_t i=0; i<NS; ++i )
   {

@@ -22,14 +22,14 @@ uint32_t initialSeed( size_t index )
   return seed;
 }
 
-double nextUniform01( uint32_t &seed )
+inline double nextUniform01( uint32_t &seed )
 {
   seed = (seed * 300773) % 1073741824;
   //printf( "%u\n", (unsigned)seed );
   return double(seed) / double(1073741824.0);
 }
 
-double randomNormal( uint32_t &seed )
+inline double randomNormal( uint32_t &seed )
 {
   double x1, x2, w;
   do
@@ -42,13 +42,13 @@ double randomNormal( uint32_t &seed )
   return x1 * w;
 }
 
-void randomNormalVec( double (&vec)[NS], uint32_t &seed )
+inline void randomNormalVec( double (&vec)[NS], uint32_t &seed )
 {
   for ( size_t i=0; i<NS; ++i )
     vec[i] = randomNormal( seed );
 }
 
-void multMatVec( double const (&mat)[NS][NS], double const (&vec)[NS], double (&res)[NS] )
+inline void multMatVec( double const (&mat)[NS][NS], double const (&vec)[NS], double (&res)[NS] )
 {
   for ( size_t i=0; i<NS; ++i )
   {
@@ -58,7 +58,7 @@ void multMatVec( double const (&mat)[NS][NS], double const (&vec)[NS], double (&
   }
 }
 
-double runTrial(
+inline double runTrial(
   size_t index,
   size_t numTradingDays,
   double dt,
@@ -211,6 +211,7 @@ int doubleCompare( void const *_lhs, void const *_rhs )
 
 int main( int argc, char **argv )
 {
+  //size_t const numTrials = 65536;
   size_t const numTrials = 1048576;
   double *trialResults = new double[numTrials];
 
