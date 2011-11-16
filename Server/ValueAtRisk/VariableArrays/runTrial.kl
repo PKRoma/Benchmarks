@@ -1,0 +1,90 @@
+function Size initialSeed(Size index) {
+  Size result = 1;
+  Size mult = 300773;
+  for (Size mask=1; mask; mask<<=1) {
+    if (index & mask)
+      result = (result * mult) % 1073741824;
+    mult = (mult * mult) % 1073741824;
+  }
+  return result;
+}
+
+function Float64 random(io Size seed) {
+  seed = (seed * 300773) % 1073741824;
+  //report "seed = " + seed;
+  Float64 result = Float64(seed) / 1073741824.0;
+  return result;
+}
+
+function Float64 randomNormal(io Size seed) {
+  Float64 x1, x2, w;
+  do {
+    x1 = 2.0 * random(seed) - 1.0;
+    x2 = 2.0 * random(seed) - 1.0;
+    w = x1 * x1 + x2 * x2;
+  } while (w >= 1.0);
+  w = sqrt64( (-2.0 * log64(w)) / w );
+  return x1 * w;
+}   
+
+alias Float64 Vec[];
+
+function Vec randomNormalVec(Size length, io Size seed) {
+  Vec result;
+  result.resize(length);
+  for (Size i=0; i<length; ++i)
+    result[i] = randomNormal(seed);
+  return result;
+}
+
+alias Float64 Mat[][];
+
+function Vec *( Mat mat, Vec vec ) {
+  Size length = vec.size;
+  Vec result;
+  result.resize(length);
+  for (Size i=0; i<length; ++i) {
+    result[i] = 0.0;
+    for (Size j=0; j<length; ++j)
+      result[i] += mat[i][j] * vec[j];
+  }
+  return result;
+}
+
+operator runTrial(
+  Size index,
+  io Size numTradingDays,
+  io Float64 dt,
+  io Float64 sqrtDT,
+  io Mat choleskyTrans,
+  io Vec drifts,
+  io Float64 value
+  )
+{
+  Size numStocks = drifts.size;
+
+  //report "index="+index+" numTradingDays="+numTradingDays+" dt="+dt+" sqrtDT="+sqrtDT;
+  //report "choleskyTrans="+choleskyTrans;
+  //report "drifts="+drifts;
+
+  Size seed = initialSeed(4096 * (1+index));
+
+  Vec amounts;
+  amounts.resize(numStocks);
+  for (Size i=0; i<numStocks; ++i)
+    amounts[i] = 100;
+
+  for (Size day=0; day<numTradingDays; ++day) {
+    Vec Z = randomNormalVec(numStocks, seed);
+    //report "Z="+Z;
+    Vec X = choleskyTrans * Z;
+    //report "X="+X;
+    for (Size i=0; i<numStocks; ++i) {
+      amounts[i] *= exp64(drifts[i]*dt + X[i]*sqrtDT);
+    }
+  }
+
+  value = 0.0;
+  for (Size i=0; i<numStocks; ++i)
+    value += amounts[i];
+}
