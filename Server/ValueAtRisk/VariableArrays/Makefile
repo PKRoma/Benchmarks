@@ -1,4 +1,5 @@
-CFLAGS=-O6 -march=native
+#CFLAGS=-O6 -march=native
+CFLAGS=-O6
 
 all: var-st var-mt VarMT.class
 

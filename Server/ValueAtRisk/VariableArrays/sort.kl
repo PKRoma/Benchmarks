@@ -42,5 +42,7 @@ operator sort(
   io Float64 v<>
   )
 {
+  //report "start sort";
   qsort(v, 0, v.size);
+  //report "end sort";
 }

@@ -29,26 +29,22 @@ function Float64 randomNormal(io Size seed) {
 
 alias Float64 Vec[];
 
-function Vec randomNormalVec(Size length, io Size seed) {
-  Vec result;
+function randomNormalVec(Size length, io Size seed, io Vec result) {
   result.resize(length);
   for (Size i=0; i<length; ++i)
     result[i] = randomNormal(seed);
-  return result;
 }
 
 alias Float64 Mat[][];
 
-function Vec *( Mat mat, Vec vec ) {
+function multMatVec( Mat mat, Vec vec, io Vec result ) {
   Size length = vec.size;
-  Vec result;
   result.resize(length);
   for (Size i=0; i<length; ++i) {
     result[i] = 0.0;
     for (Size j=0; j<length; ++j)
       result[i] += mat[i][j] * vec[j];
   }
-  return result;
 }
 
 operator runTrial(
@@ -74,10 +70,11 @@ operator runTrial(
   for (Size i=0; i<numStocks; ++i)
     amounts[i] = 100;
 
+  Vec X, Z;
   for (Size day=0; day<numTradingDays; ++day) {
-    Vec Z = randomNormalVec(numStocks, seed);
+    randomNormalVec(numStocks, seed, Z);
     //report "Z="+Z;
-    Vec X = choleskyTrans * Z;
+    multMatVec( choleskyTrans, Z, X );
     //report "X="+X;
     for (Size i=0; i<numStocks; ++i) {
       amounts[i] *= exp64(drifts[i]*dt + X[i]*sqrtDT);

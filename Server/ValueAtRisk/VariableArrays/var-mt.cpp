@@ -84,11 +84,10 @@ inline double runTrial(
   for ( size_t i=0; i<NS; ++i )
     amounts[i] = 100.0;
 
+  Vec Z, X;
   for ( size_t day=0; day<numTradingDays; ++day )
   {
-    Vec Z;
     randomNormalVec( length, Z, seed );
-    Vec X;
     multMatVec( choleskyTrans, Z, X );
     for ( size_t i=0; i<NS; ++i )
       amounts[i] *= exp(drifts[i]*dt + X[i]*sqrtDT);
