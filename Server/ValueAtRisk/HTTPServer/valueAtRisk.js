@@ -18,15 +18,18 @@ require('http').createServer(function (req, res) {
     var query = url.parse(req.url, true).query;
 
     var numStocks = 0;
+    var initialPrices = [];
     var priceMeans = [];
     var priceDevs = [];
     var priceCorrs = [];
     for (;;) {
       var i = numStocks;
+      var initialPriceName = "ip_"+(i+1);
       var priceMeanName = "pm_"+(i+1);
       var priceDevName = "pd_"+(i+1);
-      if ((priceMeanName in query) && (priceDevName in query)) {
-        priceMeans[i] = parseFloat(query[priceMeanName]);
+      if ((initialPriceName in query) && (priceMeanName in query) && (priceDevName in query)) {
+        initialPrices[i] = parseFloat(query[initialPriceName]);
+        priceMeans[i] = parseFloat(query[priceMeanName]) / numTradingDays;
         priceDevs[i] = parseFloat(query[priceDevName]) / numTradingDays;
         priceCorrs[i] = [];
         for (var j=0; j<numStocks; ++j) {
@@ -71,6 +74,10 @@ require('http').createServer(function (req, res) {
       for (var i=0; i<numStocks; ++i)
         drifts[i] = priceMeans[i] - priceCovariance[i][i]/2;
 
+      var totalInitialPrice = 0.0;
+      for (var i=0; i<numStocks; ++i)
+        totalInitialPrice += initialPrices[i];
+
       var numTrials = 16384;
 
       var valueAtRisk;
@@ -79,6 +86,7 @@ require('http').createServer(function (req, res) {
         params.addMember('numTradingDays', 'Size', numTradingDays);
         params.addMember('dt', 'Float64', dt);
         params.addMember('sqrtDT', 'Float64', sqrtDT);
+        params.addMember('initialPrices', 'Float64['+numStocks+']');
         params.addMember('choleskyTrans', 'Float64['+numStocks+']['+numStocks+']');
         params.setData('choleskyTrans', choleskyTrans);
         params.addMember('drifts', 'Float64['+numStocks+']');
@@ -134,7 +142,7 @@ require('http').createServer(function (req, res) {
         }
         trials.evaluate();
 
-        valueAtRisk = (numStocks * 100.0) - trials.getData('value', Math.round(numTrials*0.05));
+        valueAtRisk = totalInitialPrice - trials.getData('value', Math.round(numTrials*0.05));
       }
       else {
         trialResults = [];
@@ -146,7 +154,7 @@ require('http').createServer(function (req, res) {
           //console.log("drifts="+drifts);
           var amounts = [];
           for (var i=0; i<numStocks; ++i)
-            amounts[i] = 100;
+            amounts[i] = initialPrices[i];
 
           for (var day=1; day<=numTradingDays; ++day) {
             var Z = MathExt.random.normalVec(numStocks, prng);
@@ -198,7 +206,7 @@ require('http').createServer(function (req, res) {
         };
 
         sort(trialResults);
-        valueAtRisk = (numStocks * 100.0) - trialResults[Math.round(numTrials*0.05)];
+        valueAtRisk = totalInitialPrice - trialResults[Math.round(numTrials*0.05)];
       }
 
       res.writeHead(200, {'Content-Type': 'text/plain'});
