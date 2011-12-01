@@ -1,9 +1,8 @@
-//fabric = require('Fabric');
+fabric = require('Fabric');
 http = require('http');
-//fs = require('fs');
+fs = require('fs');
 
 http.createServer(function (req, res) {
-  /*
   (function (fabricClient) {
     var fibOp = fabricClient.DG.createOperator("fibonacci");
     fibOp.setSourceCode("fibonacci.kl", fs.readFileSync("fibonacci.kl", "utf8"));
@@ -28,7 +27,4 @@ http.createServer(function (req, res) {
       fabricClient.close();
     });
   })(fabric.createClient());
-  */
-  res.writeHead(200, {'Content-Type': 'text/plain'});
-  res.end("Hello\n");
 }).listen(1337, "127.0.0.1");
