@@ -3,10 +3,30 @@ fs = require('fs');
 url = require('url');
 MathExt = require('./MathExt.js');
 
-var useFabric = true;
-var debug = true;
+// shutdown server after maxRequests requests
+var maxRequests = 20;
 
-require('http').createServer(function (req, res) {
+var useFabric = false;
+var debug = false;
+var numRequests = 0;
+var requestsOutstanding = 0;
+
+if (process.argv.length > 2) {
+  if (process.argv[2] == '-f')
+    useFabric = true;
+  else
+  {
+    console.log('invalid command line flag');
+    process.exit(1);
+  }
+}
+
+var server = require('http').createServer(function (req, res) {
+  if (numRequests++ >= maxRequests)
+    return;
+
+  requestsOutstanding++;
+
   var numTradingDays = 252;
   var dt = 1.0/numTradingDays;
   var sqrtDT = Math.sqrt(dt);
@@ -143,6 +163,9 @@ require('http').createServer(function (req, res) {
           res.writeHead(200, {'Content-Type': 'text/plain'});
           res.end(valueAtRisk + "\n");
           fabricClient.close();
+
+          if (--requestsOutstanding < 1 && numRequests >= maxRequests)
+            server.close();
         });
       })(fabric.createClient());
     }
@@ -213,8 +236,13 @@ require('http').createServer(function (req, res) {
       var valueAtRisk = totalInitialPrice - trialResults[Math.round(numTrials*0.05)];
       res.writeHead(200, {'Content-Type': 'text/plain'});
       res.end(valueAtRisk + "\n");
+
+      if (--requestsOutstanding < 1 && numRequests >= maxRequests)
+        server.close();
     }
   }
-}).listen(1337, "127.0.0.1");
+});
+server.listen(1337, "127.0.0.1");
+
 console.log('Server running at http://127.0.0.1:1337/');
 
