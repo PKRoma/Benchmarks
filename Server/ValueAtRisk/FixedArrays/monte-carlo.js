@@ -173,3 +173,5 @@ else {
   valueAtRisk = (numStocks * 100.0) - trialResults[Math.round(numTrials*0.05)];
 }
 console.log("ValueAtRisk = " + valueAtRisk);
+
+FABRIC.close();

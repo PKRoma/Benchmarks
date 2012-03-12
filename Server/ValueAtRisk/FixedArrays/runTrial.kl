@@ -23,7 +23,7 @@ function Float64 randomNormal(io Size seed) {
     x2 = 2.0 * random(seed) - 1.0;
     w = x1 * x1 + x2 * x2;
   } while (w >= 1.0);
-  w = sqrt64( (-2.0 * log64(w)) / w );
+  w = sqrt( (-2.0 * log(w)) / w );
   return x1 * w;
 }   
 
@@ -74,7 +74,7 @@ operator runTrial(
     Vec X = choleskyTrans * Z;
     //report "X="+X;
     for (Size i=0; i<%NS%; ++i) {
-      amounts[i] *= exp64(drifts[i]*dt + X[i]*sqrtDT);
+      amounts[i] *= exp(drifts[i]*dt + X[i]*sqrtDT);
     }
   }
 
