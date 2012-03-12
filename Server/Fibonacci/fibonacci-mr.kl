@@ -7,7 +7,7 @@ function Integer fib(Integer n) {
 
 operator fibonacci(
   io Integer result,
-  Integer n;
+  Integer n
   )
 {
   result = fib(n);
