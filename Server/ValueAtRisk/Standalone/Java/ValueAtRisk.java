@@ -12,7 +12,7 @@ import static java.lang.Math.sqrt;
  * Date: 11/12/11
  * Time: 1:59 PM
  */
-public class VarMT {
+public class ValueAtRisk {
 
   static final int NS = 10;
   static final int CORES = 8;
