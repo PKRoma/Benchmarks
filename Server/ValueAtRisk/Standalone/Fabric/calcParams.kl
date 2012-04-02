@@ -1,0 +1,26 @@
+require MathExt;
+operator calcParams(
+  io Size numTradingDays,
+  io Vec priceMeans,
+  io Vec priceDevs,
+  io Float64 dt,
+  io Float64 sqrtDT,
+  io Mat choleskyT,
+  io Vec drifts
+  ) {
+  dt = 1.0/numTradingDays;
+  sqrtDT = sqrt(dt);
+  
+  Size seed = initialSeed(0);
+  Mat priceCorrelations = randomCorrelation(seed);
+  Mat priceCovariance;
+  for (Index i=0; i<%NS%; ++i) {
+    for (Index j=0; j<%NS%; ++j) {
+      priceCovariance[i][j] = priceDevs[i] * priceDevs[j] * priceCorrelations[i][j];
+    }
+  }
+  choleskyT = choleskyTrans(priceCovariance);
+
+  for (Index i=0; i<%NS%; ++i)
+    drifts[i] = priceMeans[i] - priceCovariance[i][i]/2;
+}

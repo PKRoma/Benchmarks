@@ -19,8 +19,6 @@ for (var i=0; i<numStocks; ++i)
   priceDevs[i] = 25.0/numTradingDays;
 
 var priceCorrelations = MathExt.randomCorrelation(numStocks, prng);
-console.log("priceCorrelations:");
-console.log(priceCorrelations);
 
 var priceCovariance = [];
 for (var i=0; i<numStocks; ++i) {
@@ -29,8 +27,6 @@ for (var i=0; i<numStocks; ++i) {
     priceCovariance[i][j] = priceDevs[i] * priceDevs[j] * priceCorrelations[i][j];
   }
 }
-console.log("priceCovariance:");
-console.log(priceCovariance);
 
 var choleskyTrans = MathExt.choleskyTrans(priceCovariance);
 

@@ -1,0 +1,132 @@
+function Size initialSeed(Size index) {
+  Size result = 1;
+  Size mult = 300773;
+  for (Size mask=1; mask; mask<<=1) {
+    if (index & mask)
+      result = (result * mult) % 1073741824;
+    mult = (mult * mult) % 1073741824;
+  }
+  return result;
+}
+
+function Float64 random(io Size seed) {
+  seed = (seed * Size(300773)) % Size(1073741824);
+  Float64 result = Float64(seed) / 1073741824.0;
+  return result;
+}
+
+function Float64 randomNormal(io Size seed) {
+  Float64 x1, x2, w;
+  do {
+    x1 = 2.0 * random(seed) - 1.0;
+    x2 = 2.0 * random(seed) - 1.0;
+    w = x1 * x1 + x2 * x2;
+  } while (w >= 1.0);
+  w = sqrt( (-2.0 * log(w)) / w );
+  Float64 result = x1 * w;
+  return result;
+}   
+
+alias Float64 Vec[%NS%];
+
+function Vec randomNormalVec(io Size seed) {
+  Vec result;
+  for (Size i=0; i<%NS%; ++i)
+    result[i] = randomNormal(seed);
+  return result;
+}
+
+function Float64 normSq(Vec vec) {
+  Float64 result = 0.0;
+  for (Index i=0; i<%NS%; ++i)
+    result += vec[i]*vec[i];
+  return result;
+}
+
+function Float64 norm(Vec vec) {
+  return sqrt(normSq(vec));
+}
+
+function Vec./=(Float64 x) {
+  for (Index i=0; i<%NS%; ++i) {
+    this[i] /= x;
+  }
+}
+
+function normalize(io Vec vec) {
+  vec /= norm(vec);
+}
+
+alias Vec Mat[%NS%];
+
+function Vec *( Mat mat, Vec vec ) {
+  Vec result;
+  for (Size i=0; i<%NS%; ++i) {
+    result[i] = 0.0;
+    for (Size j=0; j<%NS%; ++j)
+      result[i] += mat[i][j] * vec[j];
+  }
+  return result;
+}
+
+function Mat *(Mat lhs, Mat rhs) {
+  Mat res;
+  for (Index i=0; i<%NS%; ++i) {
+    for (Index j=0; j<%NS%; ++j) {
+      for (Index k=0; k<%NS%; ++k) {
+        res[i][j] += lhs[i][k] * rhs[k][j];
+      }
+    }
+  }
+  return res;
+}
+
+function Mat trans(Mat mat) {
+  Mat res;
+  for (Index i=0; i<%NS%; ++i) {
+    for (Index j=0; j<%NS%; ++j) {
+      res[j][i] = mat[i][j];
+    }
+  }
+  return res;
+}
+
+function Mat randomCorrelation(io Size seed) {
+  Mat T;
+  for (Index i=0; i<%NS%; ++i) {
+    for (Index j=0; j<%NS%; ++j) {
+      T[i][j] = randomNormal(seed);
+    }
+  }
+  for (Index j=0; j<%NS%; ++j) {
+    Float64 sqSum = 0.0;
+    for (Index i=0; i<%NS%; ++i) {
+      sqSum += T[i][j] * T[i][j];
+    }
+    Float64 norm = sqrt(sqSum);
+    for (Index i=0; i<%NS%; ++i) {
+      T[i][j] /= norm;
+    }
+  }
+  return trans(T) * T;
+}
+
+function Mat choleskyTrans(Mat A) {
+  Mat L;
+  for (Index i=0; i<%NS%; ++i) {
+    for (Index j=0; j<(i+1); ++j ) {
+      Float64 s = 0.0;
+      for (Index k=0; k<j; ++k)
+        s += L[i][k] * L[j][k];
+      if (i == j)
+        L[i][i] = sqrt(A[i][i]-s);
+      else
+        L[i][j] = 1.0/L[j][j]*(A[i][j]-s);
+    }
+  }
+  return L;
+}
+
+function Mat cholesky(Mat A) {
+  return trans(choleskyTrans(A));
+}

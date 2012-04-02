@@ -35,8 +35,10 @@ module.exports = {
       this.nextUniform01 = function () {
         cur = mul(cur, base);
         var seed = ((cur.lo + (cur.hi<<15))&0x3FFFFFFF);
-        //console.log("seed = " + seed);
         return seed / 1073741824.0;
+      };
+      this.curSeed = function() {
+        return ((cur.lo + (cur.hi<<15))&0x3FFFFFFF);
       }
     },
 
@@ -48,7 +50,8 @@ module.exports = {
         w = x1 * x1 + x2 * x2;
       } while (w >= 1.0);
       w = Math.sqrt( (-2.0 * Math.log(w)) / w );
-      return x1 * w;
+      var result = x1 * w;
+      return result;
     },
 
     normalVec: function (n, generator) {
