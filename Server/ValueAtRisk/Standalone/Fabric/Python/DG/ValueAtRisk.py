@@ -15,8 +15,8 @@ for i in range(numStocks):
 #numTrials = 1
 #numTrials = 256
 #numTrials = 65536
-#numTrials = 262144
-numTrials = 1048576
+numTrials = 262144
+#numTrials = 1048576
 
 includeDir = '../..'
 def includeKL(filename):

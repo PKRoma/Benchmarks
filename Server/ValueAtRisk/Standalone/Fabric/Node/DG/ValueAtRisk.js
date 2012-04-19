@@ -15,8 +15,8 @@ for (var i=0; i<numStocks; ++i)
 //var numTrials = 1;
 //var numTrials = 256;
 //var numTrials = 65536;
-//var numTrials = 262144;
-var numTrials = 1048576;
+var numTrials = 262144;
+//var numTrials = 1048576;
 
 var valueAtRisk;
 
